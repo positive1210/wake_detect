@@ -22,15 +22,16 @@ void feed_Task(void *arg)
     int nch = afe_handle->get_feed_channel_num(afe_data);
     int feed_channel = esp_get_feed_channel();
     assert(nch==feed_channel);
-    uint8_t *i2s_buff = malloc(audio_chunksize * sizeof(uint8_t) * feed_channel);
+    int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * feed_channel);
     assert(i2s_buff);
-    int16_t *i2s_goes_in_afe = malloc(audio_chunksize * sizeof(uint8_t) * feed_channel / 2);
-    while (task_flag) {
-        esp_get_feed_data(true, i2s_buff, audio_chunksize * sizeof(uint8_t) * feed_channel,i2s_goes_in_afe);
 
-        printf("audio data:%d\n",i2s_goes_in_afe[0]);
+    while (task_flag) {
+        esp_get_feed_data(true, i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
+        // printf("audio data:\t0x%08x,\t0x%08x,\t0x%08x,\t0x%08x\n",i2s_buff[0],i2s_buff[1],i2s_buff[2],i2s_buff[3]);
+        // printf("audio data:\t%08d,\t%08d,\t%08d,\t%08d\n",i2s_buff[0],i2s_buff[1],i2s_buff[2],i2s_buff[3]);
+        printf("audio data:\t%d,\t%d,\t%d,\t%d\n",i2s_buff[0],i2s_buff[1],i2s_buff[2],i2s_buff[3]);
         vTaskDelay(100/portTICK_PERIOD_MS);
-        afe_handle->feed(afe_data, i2s_goes_in_afe);
+        afe_handle->feed(afe_data, i2s_buff);
     }
     if (i2s_buff) {
         free(i2s_buff);

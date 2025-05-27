@@ -24,7 +24,6 @@ void feed_Task(void *arg)
     assert(nch==feed_channel);
     int16_t *i2s_buff = malloc(audio_chunksize * sizeof(int16_t) * feed_channel);
     assert(i2s_buff);
-
     while (task_flag) {
         esp_get_feed_data(true, i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
         // printf("audio data:\t%#04x,\t%#04x,\t%#04x,\t%#04x\n",i2s_buff[0],i2s_buff[1],i2s_buff[2],i2s_buff[3]);
@@ -45,10 +44,9 @@ void detect_Task(void *arg)
 {
     esp_afe_sr_data_t *afe_data = arg;
     int afe_chunksize = afe_handle->get_fetch_chunksize(afe_data);
-    int16_t *buff = malloc(afe_chunksize * sizeof(int16_t));
-    assert(buff);
+    // int16_t *buff = malloc(afe_chunksize * sizeof(int16_t));
+    // assert(buff);
     printf("------------detect start------------\n");
-
     while (task_flag) {
         afe_fetch_result_t* res = afe_handle->fetch(afe_data); 
         if (!res || res->ret_value == ESP_FAIL) {
@@ -56,17 +54,18 @@ void detect_Task(void *arg)
             break;
         }
         // printf("vad state: %d\n", res->vad_state);
-
+        
         if (res->wakeup_state == WAKENET_DETECTED) {
             printf("wakeword detected\n");
 	        printf("model index:%d, word index:%d\n", res->wakenet_model_index, res->wake_word_index);
             printf("-----------LISTENING-----------\n");
         }
+        
     }
-    if (buff) {
-        free(buff);
-        buff = NULL;
-    }
+    // if (buff) {
+    //     free(buff);
+    //     buff = NULL;
+    // }
     vTaskDelete(NULL);
 }
 

@@ -48,9 +48,10 @@ esp_err_t esp_get_feed_data(bool is_get_raw_channel, int16_t *buffer, int buffer
     // }
     int samples = bytes_read / sizeof(int32_t);
     for (int i = 0; i < samples; i++) {
-        int32_t value = temp_buffer[i] >> 12;
+        int32_t value = temp_buffer[i] >>12;
         buffer[i] = (value > INT16_MAX) ? INT16_MAX : (value < -INT16_MAX) ? -INT16_MAX : (int16_t)value;
     }
+
     free(temp_buffer);
     return ret;
 }

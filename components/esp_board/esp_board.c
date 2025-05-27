@@ -9,10 +9,7 @@
 #include "freertos/task.h"
 #define ADC_I2S_CHANNEL 1
 static const char *TAG = "board";
-static int s_play_sample_rate = 16000;
-static int s_play_channel_format = 1;
-static int s_bits_per_chan = 16;
-static i2s_chan_handle_t                rx_handle = NULL;        // I2S rx channel handler
+static i2s_chan_handle_t rx_handle = NULL;        // I2S rx channel handler
 
 static esp_err_t esp_i2s_init(i2s_port_t i2s_num, uint32_t sample_rate, int channel_format, int bits_per_chan)
 {
@@ -42,29 +39,30 @@ esp_err_t esp_get_feed_data(bool is_get_raw_channel, int16_t *buffer, int buffer
 {
     esp_err_t ret = ESP_OK;
     size_t bytes_read;
-    int audio_chunksize = buffer_len / (sizeof(int32_t));
-    ret = i2s_channel_read(rx_handle, buffer, buffer_len, &bytes_read, portMAX_DELAY);
-    int32_t *tmp_buff = buffer;
-    for (int i = 0; i < audio_chunksize; i++) {
-        tmp_buff[i] = (tmp_buff[i] >> 14)*1000; // 32:8为有效位， 8:0为低8位， 全为0， AFE的输入为16位语音数据，拿29：13位是为了对语音信号放大。
+    int audio_samples = buffer_len / (sizeof(int32_t));
+    int32_t *temp_buffer = malloc(audio_samples * sizeof(int32_t));
+    ret = i2s_channel_read(rx_handle, temp_buffer, audio_samples * sizeof(int32_t), &bytes_read, portMAX_DELAY);
+    // buffer = tmp_buff;
+    // for (int i = 0; i < audio_samples; i++) {
+    //     tmp_buff[i] = (tmp_buff[i] >> 14); // 32:8为有效位， 8:0为低8位， 全为0， AFE的输入为16位语音数据，拿29：13位是为了对语音信号放大。
+    // }
+    int samples = bytes_read / sizeof(int32_t);
+    for (int i = 0; i < samples; i++) {
+        int32_t value = temp_buffer[i] >> 12;
+        buffer[i] = (value > INT16_MAX) ? INT16_MAX : (value < -INT16_MAX) ? -INT16_MAX : (int16_t)value;
     }
+    free(temp_buffer);
     return ret;
-    // esp_err_t ret=ESP_OK;
-    // size_t bytes_read;
-    // int audio_chunksize=buffer_len/(sizeof(int32_t));
-
 }
 
 int esp_get_feed_channel(void)
 {
     return ADC_I2S_CHANNEL;
 }
-
 char* esp_get_input_format(void)
 {
     return "M";
 }
-
 esp_err_t esp_board_init(uint32_t sample_rate, int channel_format, int bits_per_chan)
 {
     esp_i2s_init(I2S_NUM_AUTO, 16000, 1, 32);

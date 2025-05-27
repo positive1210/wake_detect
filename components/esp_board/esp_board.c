@@ -96,7 +96,7 @@ esp_err_t esp_get_feed_data(bool is_get_raw_channel, uint8_t *buffer, int buffer
                 
                 if (sample & 0x00800000)
                     sample |= 0xFF000000;
-                out_buffer[i/4]=sample;
+                out_buffer[i/4]=sample/100;
                 if (abs(out_buffer[i/4])>100000)
                 {
                    printf("wtf!?%d\n",out_buffer[i/4]);

@@ -53,8 +53,8 @@ esp_err_t esp_board_init(uint32_t sample_rate, int channel_format, int bits_per_
  *    - ESP_OK                  Success
  *    - Others                  Fail
  */
-// esp_err_t esp_get_feed_data(bool is_get_raw_channel, uint8_t *buffer, int buffer_len);
-esp_err_t esp_get_feed_data(bool is_get_raw_channel, uint8_t *buffer, int buffer_len, int16_t *out_buffer);
+esp_err_t esp_get_feed_data(bool is_get_raw_channel, int16_t *buffer, int buffer_len);
+// esp_err_t esp_get_feed_data(bool is_get_raw_channel, uint8_t *buffer, int buffer_len, int16_t *out_buffer);
 /**
  * @brief Get the record channel number.
  * 

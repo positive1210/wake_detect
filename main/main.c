@@ -28,8 +28,8 @@ void feed_Task(void *arg)
         esp_get_feed_data(true, i2s_buff, audio_chunksize * sizeof(int16_t) * feed_channel);
         // printf("audio data:\t%#04x,\t%#04x,\t%#04x,\t%#04x\n",i2s_buff[0],i2s_buff[1],i2s_buff[2],i2s_buff[3]);
         // // printf("audio data:\t%08d,\t%08d,\t%08d,\t%08d\n",i2s_buff[0],i2s_buff[1],i2s_buff[2],i2s_buff[3]);
-        // // printf("audio data:\t%d,\t%d,\t%d,\t%d\n",i2s_buff[0],i2s_buff[1],i2s_buff[2],i2s_buff[3]);
-        // vTaskDelay(100/portTICK_PERIOD_MS);
+        printf("transformed audio data:\t%d,\t%d,\t%d,\t%d\n",i2s_buff[0],i2s_buff[1],i2s_buff[2],i2s_buff[3]);
+        vTaskDelay(100/portTICK_PERIOD_MS);
         afe_handle->feed(afe_data, i2s_buff);
     }
 
@@ -81,8 +81,8 @@ void app_main()
             }
         }
     }
-    afe_config_t *afe_config = afe_config_init(esp_get_input_format(), models, AFE_TYPE_SR, AFE_MODE_LOW_COST);
-    
+    // afe_config_t *afe_config = afe_config_init(esp_get_input_format(), models, AFE_TYPE_SR, AFE_MODE_LOW_COST);
+    afe_config_t *afe_config = afe_config_init(esp_get_input_format(), models, AFE_TYPE_SR, AFE_MODE_HIGH_PERF);
     // print/modify wake word model. 
     if (afe_config->wakenet_model_name) {
         printf("wakeword model in AFE config: %s\n", afe_config->wakenet_model_name);

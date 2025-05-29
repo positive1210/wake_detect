@@ -46,11 +46,11 @@ esp_err_t esp_get_feed_data(bool is_get_raw_channel, int16_t *buffer, int buffer
     // for (int i = 0; i < audio_samples; i++) {
     //     tmp_buff[i] = (tmp_buff[i] >> 14); // 32:8为有效位， 8:0为低8位， 全为0， AFE的输入为16位语音数据，拿29：13位是为了对语音信号放大。
     // }
-    printf("transform before audio data:\t%ld,\t%d,\t%d,\t%d\n",temp_buffer[0],temp_buffer[1],temp_buffer[2],temp_buffer[3]);
-    vTaskDelay(100/portTICK_PERIOD_MS);
+    // printf("transform before audio data:\t%ld,\t%d,\t%d,\t%d\n",temp_buffer[0],temp_buffer[1],temp_buffer[2],temp_buffer[3]);
+    // vTaskDelay(100/portTICK_PERIOD_MS);
     int samples = bytes_read / sizeof(int32_t);
     for (int i = 0; i < samples; i++) {
-        int32_t value = temp_buffer[i] >>12;
+        int32_t value = (temp_buffer[i] >>12)*2;
         buffer[i] = (value > INT16_MAX) ? INT16_MAX : (value < -INT16_MAX) ? -INT16_MAX : (int16_t)value;
     }
 

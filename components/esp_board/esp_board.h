@@ -38,9 +38,9 @@
         .clk_cfg = I2S_STD_CLK_DEFAULT_CONFIG(sample_rate), \
         .slot_cfg = I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG(bits_per_chan, channel_fmt), \
         .gpio_cfg = { \
-        .mclk = GPIO_MIC_I2S_MCLK, \
-        .bclk = GPIO_MIC_I2S_SCLK, \
-        .ws   = GPIO_MIC_I2S_LRCK, \
+        .mclk = GPIO_SPEAKER_I2S_MCLK, \
+        .bclk = GPIO_SPEAKER_I2S_SCLK, \
+        .ws   = GPIO_SPEAKER_I2S_LRCK, \
         .dout = GPIO_SPEAKER_I2S_DOUT, \
         .din  = GPIO_I2S_DIN, \
         .invert_flags = { \
@@ -68,9 +68,6 @@ esp_err_t esp_board_init(uint32_t sample_rate, int channel_format, int bits_per_
 
 /**
  * @brief Get the record pcm data.
- * 
- * @param is_get_raw_channel Whether to get the recording data of the original number of channels. 
- *                           Otherwise, the corresponding number of channels will be filtered based on the board.
  * @param buffer The buffer where the data is stored.
  * @param buffer_len The buffer length.
  * @return
@@ -96,6 +93,13 @@ int speaker_write_data(const int16_t *buffer, int buffer_len,  uint8_t output_vo
  * @return The record channel number.
  */
 int esp_get_feed_channel(void);
+
+/**
+ * @brief esp_audio_play
+ * 
+ * @return - The number of bytes written to the speaker.
+ */
+int esp_audio_play(const int16_t* pcm_data, int length,uint8_t play_volume);
 
 /**
  * @brief Get the input format of the board.

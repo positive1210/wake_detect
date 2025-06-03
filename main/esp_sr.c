@@ -54,7 +54,7 @@ void detect_Task(void *arg)
     char *mn_name = esp_srmodel_filter(models, ESP_MN_PREFIX, ESP_MN_CHINESE); // 初始化命令词模型
     printf("multinet:%s\n", mn_name); // 打印命令词模型名称
     esp_mn_iface_t *multinet = esp_mn_handle_from_name(mn_name);
-    model_iface_data_t *model_data = multinet->create(mn_name, 6000);  // 设置唤醒后等待事件 6000代表6000毫秒，6秒后退出命令词识别
+    model_iface_data_t *model_data = multinet->create(mn_name, 10000);  // 设置唤醒后等待事件 6000代表6000毫秒，6秒后退出命令词识别
     esp_mn_commands_clear(); // 清除当前的命令词列表
     esp_mn_commands_add(1, "jia yao"); // 加药
     esp_mn_commands_add(2, "que ren jia yao"); // 确认加药
@@ -71,16 +71,21 @@ void detect_Task(void *arg)
             ESP_LOGE(TAG, "fetch error!\n");
             break;
         }
+        // if (res->wakeup_state == WAKENET_DETECTED) {
+        //     ESP_LOGI(TAG, "WAKEWORD DETECTED\n");
+	    //     multinet->clean(model_data);  // clean all status of multinet
+        // } else if (res->wakeup_state == WAKENET_CHANNEL_VERIFIED) {  // 检测到唤醒词
+        //     // play_voice = -1;
+        //     afe_handle->disable_wakenet(afe_data);  // 关闭唤醒词识别
+        //     detect_flag = 1; // 标记已检测到唤醒词
+        //     ESP_LOGI(TAG, "AFE_FETCH_CHANNEL_VERIFIED, channel index: %d\n", res->trigger_channel_id);
+        // }
         if (res->wakeup_state == WAKENET_DETECTED) {
-            ESP_LOGI(TAG, "WAKEWORD DETECTED\n");
-	        multinet->clean(model_data);  // clean all status of multinet
-        } else if (res->wakeup_state == WAKENET_CHANNEL_VERIFIED) {  // 检测到唤醒词
-            // play_voice = -1;
+            multinet->clean(model_data);  // clean all status of multinet
             afe_handle->disable_wakenet(afe_data);  // 关闭唤醒词识别
             detect_flag = 1; // 标记已检测到唤醒词
-            ESP_LOGI(TAG, "AFE_FETCH_CHANNEL_VERIFIED, channel index: %d\n", res->trigger_channel_id);
+            ESP_LOGI(TAG, "WAKEWORD DETECTED\n");
         }
-
         if (detect_flag == 1) {
             esp_mn_state_t mn_state = multinet->detect(model_data, res->data); // 检测命令词
             if (mn_state == ESP_MN_STATE_DETECTING) {

@@ -12,6 +12,7 @@
 #define ADC_I2S_CHANNEL 1
 static i2s_chan_handle_t rx_handle = NULL;        // I2S rx channel handler
 static i2s_chan_handle_t tx_handle = NULL;        // I2S tx channel handler
+
 static esp_err_t mic_i2s_init(i2s_port_t i2s_num, uint32_t sample_rate, int channel_format, int bits_per_chan)
 {
     esp_err_t ret_val = ESP_OK;
@@ -34,7 +35,7 @@ static esp_err_t speaker_i2s_init(i2s_port_t i2s_num, uint32_t sample_rate, int 
 
     i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(i2s_num, I2S_ROLE_MASTER);
 
-    ret_val |= i2s_new_channel(&chan_cfg, NULL, &tx_handle);
+    ret_val |= i2s_new_channel(&chan_cfg, &tx_handle, NULL);
     i2s_std_config_t std_cfg = SPEAKER_I2S_SIMPLEX_CONFIG_DEFAULT(16000, I2S_SLOT_MODE_MONO, 32);
     std_cfg.slot_cfg.slot_mask = I2S_STD_SLOT_LEFT;
     ret_val |= i2s_channel_init_std_mode(tx_handle, &std_cfg);
@@ -100,6 +101,11 @@ int esp_get_feed_channel(void)
     return ADC_I2S_CHANNEL;
 }
 
+int esp_audio_play(const int16_t* pcm_data, int length,uint8_t play_volume)
+{
+    return speaker_write_data(pcm_data,length/sizeof(int16_t),play_volume);
+}
+
 char* esp_get_input_format(void)
 {
     return "M";
@@ -107,8 +113,8 @@ char* esp_get_input_format(void)
 
 esp_err_t esp_board_init(uint32_t sample_rate, int channel_format, int bits_per_chan)
 {
-    mic_i2s_init(I2S_NUM_AUTO, 16000, 1, 32);
-    speaker_i2s_init(I2S_NUM_AUTO, 16000, 1, 32);
+    mic_i2s_init(I2S_NUM_0, 16000, 1, 32);
+    speaker_i2s_init(I2S_NUM_1, 16000, 1, 32);
     return ESP_OK;
 }
 

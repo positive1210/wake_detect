@@ -14,5 +14,3 @@ void confirm_add_drugs()
     // audio_tts("确认添加药品");
 }
  
-
-

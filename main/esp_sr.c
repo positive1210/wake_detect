@@ -71,15 +71,15 @@ void detect_Task(void *arg)
             ESP_LOGE(TAG, "fetch error!\n");
             break;
         }
-        // if (res->wakeup_state == WAKENET_DETECTED) {
-        //     ESP_LOGI(TAG, "WAKEWORD DETECTED\n");
-	    //     multinet->clean(model_data);  // clean all status of multinet
-        // } else if (res->wakeup_state == WAKENET_CHANNEL_VERIFIED) {  // 检测到唤醒词
-        //     // play_voice = -1;
-        //     afe_handle->disable_wakenet(afe_data);  // 关闭唤醒词识别
-        //     detect_flag = 1; // 标记已检测到唤醒词
-        //     ESP_LOGI(TAG, "AFE_FETCH_CHANNEL_VERIFIED, channel index: %d\n", res->trigger_channel_id);
-        // }
+        if (res->wakeup_state == WAKENET_DETECTED) {
+            ESP_LOGI(TAG, "WAKEWORD DETECTED\n");
+	        multinet->clean(model_data);  // clean all status of multinet
+        } else if (res->wakeup_state == WAKENET_CHANNEL_VERIFIED) {  // 检测到唤醒词
+            // play_voice = -1;
+            afe_handle->disable_wakenet(afe_data);  // 关闭唤醒词识别
+            detect_flag = 1; // 标记已检测到唤醒词
+            ESP_LOGI(TAG, "AFE_FETCH_CHANNEL_VERIFIED, channel index: %d\n", res->trigger_channel_id);
+        }
         if (res->wakeup_state == WAKENET_DETECTED) {
             multinet->clean(model_data);  // clean all status of multinet
             afe_handle->disable_wakenet(afe_data);  // 关闭唤醒词识别
